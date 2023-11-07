@@ -79,7 +79,7 @@ class Spectrometer:
             print("\033[93mDeaccelation Field region added.\033[0m")
         self.lengths.append(length)
         self.electricFields.append(electricField)
-    
+
 class CalcSettings:
     def __init__(self, shiftX:    float = 0.   , shiftY:    float = 0.,    shiftTOF:     float = 0.,    \
                        stretchX:  float = 1.   , stretchY:  float = 1.,    stretchTotal: float = 1.,    \
@@ -109,10 +109,10 @@ class CalcSettings:
         self.mirrorPY             = mirrorPY        # bool
         self.shiftThenRotate      = shiftThenRotate # bool
 
+
 class Particle:
     import numpy as np
     from typing import Optional
-    import warnings
     
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \
@@ -486,7 +486,7 @@ class ParticleList:
             return self
         else:
             raise NotImplementedError
- 
+
 class Reaction:
     from typing import Optional
     import numpy as np
