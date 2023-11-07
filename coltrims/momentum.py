@@ -5,10 +5,10 @@ class CONSTANTS:
     VCM_SI_TO_AU      =  5.142_206_747_63e9
     NS_SI_TO_AU       =  2.418_884_326_585_7e-8
     EV_SI_TO_AU       = 27.211_386_245_988
-    GAUSS_TO_NS = lambda x: 1e9*(2*np.pi*9.1093837e-31)/(1.60217733e-19*x*1e-4)
+    GAUSS_TO_NS = lambda x: 1e9*(2*3.14159265359*9.1093837e-31)/(1.60217733e-19*x*1e-4)
 
 class Spectrometer:
-    from typing import Optional
+    from typing import Optional, List
     
     def __init__(self, lengths:        Optional[List[float|int]] = None, \
                        electicFields:  Optional[List[float|int]] = None, \
@@ -55,7 +55,7 @@ class Spectrometer:
                 return None
         return self._gyrationPeriod
     @gyrationPeriod.setter
-    def gyrationPeriod(self, gyrationPeriode: float|int|None):
+    def gyrationPeriod(self, gyrationPeriod: float|int|None):
         self._gyrationPeriod = gyrationPeriod
     @property
     def magneticField(self) -> float|int|None:
@@ -130,6 +130,7 @@ class Particle:
                        dtype:  np.typing.DTypeLike                  = np.double, \
                        ctype:  np.typing.DTypeLike                  = np.cdouble, \
                 ) -> None:
+        import numpy as np
         self._x      = None if x      is None else np.array(x, dtype=dtype)      # mm
         self._y      = None if y      is None else np.array(y, dtype=dtype)      # mm
         self._tof    = None if tof    is None else np.array(tof, dtype=dtype)    # ns
@@ -164,6 +165,7 @@ class Particle:
         return self._x
     @x.setter
     def x(self, x: np.ndarray) -> None:
+        import numpy as np
         self._x = np.array(x, dtype=self._dtype)
         self._recalculateMomentum = True
     
@@ -177,6 +179,7 @@ class Particle:
         return self._y
     @y.setter
     def y(self, y: np.ndarray) -> None:
+        import numpy as np
         self._y = np.array(y, dtype=self._dtype)
         self._recalculateMomentum = True
     
@@ -190,6 +193,7 @@ class Particle:
         return self._tof
     @tof.setter
     def tof(self, tof: np.ndarray) -> None:
+        import numpy as np
         self._tof = np.array(tof, dtype=self._dtype)
         self._recalculateMomentum = True
     
@@ -203,6 +207,7 @@ class Particle:
         return self._m
     @m.setter
     def m(self, m: np.ndarray) -> None:
+        import numpy as np
         self._m = np.array(m, dtype=self._dtype)
         self._recalculateMomentum = True
     
@@ -216,6 +221,7 @@ class Particle:
         return self._q
     @q.setter
     def q(self, q: np.ndarray) -> None:
+        import numpy as np
         self._q = np.array(q, dtype=self._dtype)
         self._recalculateMomentum = True
     
@@ -277,6 +283,7 @@ class Particle:
     def calcMomentum(self, spectrometer: Optional[Spectrometer] = None, \
                            calcSettings: Optional[CalcSettings] = None  \
                     ) -> None:
+        import numpy as np
         if spectrometer is None:
             spectrometer = self.spectrometer
         if calcSettings is None:
@@ -354,6 +361,7 @@ class Particle:
                              spectrometer: Spectrometer = None, \
                              calcSettings: CalcSettings = None, \
                        ) -> None:
+        import numpy as np
         if len(spectrometer) == 0:
             raise Exception("Spectrometer not sufficiently defined")
         if len(spectrometer) == 1:
@@ -384,6 +392,8 @@ class Particle:
             raise NotImplementedError("z-Momentum calculation not implemented for spectrometers with three or more regions.")
 
 class Electron(Particle):
+    from typing import Optional
+    import numpy as np
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \
                        tof:          Optional[np.ndarray]           = None, \
@@ -403,6 +413,8 @@ class Electron(Particle):
                          dtype=dtype, ctype=ctype)
         
 class Ion(Particle):
+    from typing import Optional
+    import numpy as np
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \
                        tof:          Optional[np.ndarray]           = None, \
@@ -475,8 +487,9 @@ class ParticleList:
         else:
             raise NotImplementedError
  
- class Reaction:
+class Reaction:
     from typing import Optional
+    import numpy as np
     IS_ION = 1
     IS_ELECTRON = 2
 
