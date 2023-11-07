@@ -148,6 +148,8 @@ class Particle:
         self._electricFieldPolarity = 1 if isIonSide else -1
         self._mirrorYElectron       = 1 if isIonSide else -1
         self._calcSettings          = calcSettings
+
+        self._tofMean = None
         
         self._dtype = dtype
         self._ctype = ctype
@@ -155,6 +157,16 @@ class Particle:
     def setUpdateMomentum(self):
         self._recalculateMomentum = True
     
+    @property
+    def tofMean(self) -> float:
+        if self._tofMean is None:
+            raise ValueError("The variable 'tofMean' is not yet set!")
+        return self._tofMean
+    @tofMean.setter
+    def tofMean(self, tofMean: float) -> None:
+        self._tofMean = tofMean
+        self._recalculateMomentum = True
+
     @property
     def x(self) -> np.ndarray:
         """
@@ -367,6 +379,9 @@ class Particle:
         if len(spectrometer) == 1:
             # Linear case
             length, field = spectrometer[0]
+            if length is None or length == 0:
+                # Linear Approximation
+                return field * (tof - self.tofMean) / 124.38
             return length * self.m / tof - 0.5 * (field * self._electricFieldPolarity) * self.q * tof
         if len(spectrometer) == 2:
             if spectrometer[1][1] == 0.:
