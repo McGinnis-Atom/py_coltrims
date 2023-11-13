@@ -5,6 +5,8 @@ class CONSTANTS:
     VCM_SI_TO_AU      =  5.142_206_747_63e9
     NS_SI_TO_AU       =  2.418_884_326_585_7e-8
     EV_SI_TO_AU       = 27.211_386_245_988
+    ME_SI_TO_AU       =  9.109_383_7e-31
+    U_SI_TO_KG_SI     =  1.660_539_066_60e-27
     GAUSS_TO_NS = lambda x: 1e9*(2*3.14159265359*9.1093837e-31)/(1.60217733e-19*x*1e-4)
 
 class Spectrometer:
@@ -25,6 +27,7 @@ class Spectrometer:
         self.electricFields = electicFields  if electicFields  is not None else list()
         self._gyrationPeriod = gyrationPeriod if gyrationPeriod is not None else \
                                CONSTANTS.GAUSS_TO_NS(magneticField) if magneticField is not None else None
+        self.returnAU = True
     
     def __len__(self):
         return len(self.lengths)
@@ -35,7 +38,10 @@ class Spectrometer:
     
     def __next__(self):
         if self.iterIndex < len(self):
-            val = (self.lengths[self.iterIndex], self.electricFields[self.iterIndex])
+            if self.returnAU:
+                val = (None if self.lengths[self.iterIndex] is None else self.lengths[self.iterIndex]/CONSTANTS.MM_SI_TO_AU, None if self.electricFields[self.iterIndex] is None else self.electricFields[self.iterIndex]/CONSTANTS.VCM_SI_TO_AU)
+            else:
+                val = (self.lengths[self.iterIndex], self.electricFields[self.iterIndex])
             self.iterIndex += 1
             return val
         else:
@@ -47,7 +53,10 @@ class Spectrometer:
         if index < -len(self) or index >= len(self):
             raise IndexError
         
-        return (self.lengths[index], self.electricFields[index])
+        if self.returnAU:
+            return (None if self.lengths[index] is None else self.lengths[index]/CONSTANTS.MM_SI_TO_AU, None if self.electricFields[index] is None else self.electricFields[index]/CONSTANTS.VCM_SI_TO_AU)
+        else:
+            return (self.lengths[index], self.electricFields[index])
 
     @property
     def gyrationPeriod(self) -> float|int|None:
@@ -119,6 +128,7 @@ class Particle:
                        tof:          Optional[np.ndarray]           = None, \
                        m:            Optional[np.ndarray|int|float] = None, \
                        q:            Optional[np.ndarray|int|float] = None, \
+                       tofMean:      Optional[float]                = None, \
                        px:           Optional[np.ndarray]           = None, \
                        py:           Optional[np.ndarray]           = None, \
                        pz:           Optional[np.ndarray]           = None, \
@@ -149,7 +159,7 @@ class Particle:
         self._mirrorYElectron       = 1 if isIonSide else -1
         self._calcSettings          = calcSettings
 
-        self._tofMean = None
+        self._tofMean = tofMean
         
         self._dtype = dtype
         self._ctype = ctype
@@ -236,7 +246,7 @@ class Particle:
         import numpy as np
         self._q = np.array(q, dtype=self._dtype)
         self._recalculateMomentum = True
-    
+    @property
     def px(self) -> np.ndarray:
         """
         x-momentum of particle in a.u.
@@ -244,6 +254,7 @@ class Particle:
         if self._px is None or self._recalculateMomentum:
             self.calcMomentum()
         return self._px
+    @property
     def py(self) -> np.ndarray:
         """
         y-momentum of particle in a.u.
@@ -251,6 +262,7 @@ class Particle:
         if self._py is None or self._recalculateMomentum:
             self.calcMomentum()
         return self._py
+    @property
     def pz(self) -> np.ndarray:
         """
         z-momentum of particle in a.u.
@@ -258,6 +270,7 @@ class Particle:
         if self._pz is None or self._recalculateMomentum:
             self.calcMomentum()
         return self._pz
+    @property
     def p(self) -> np.ndarray:
         """
         absolute momentum of particle in a.u.
@@ -265,6 +278,7 @@ class Particle:
         if self._p is None or self._recalculateMomentum:
             self.calcMomentum()
         return self._p
+    @property
     def energy(self) -> np.ndarray:
         """
         kinetic energy of particle in eV
@@ -302,7 +316,7 @@ class Particle:
             calcSettings = self.calcSettings
 
         if spectrometer.gyrationPeriod is not None and spectrometer.gyrationPeriod != 0:
-            omega = 2*np.pi*CONSTANTS.NS_SI_TO_AU / spectrometer.gyrationPeriod
+            omega = 2*np.pi*CONSTANTS.NS_SI_TO_AU / spectrometer.gyrationPeriod / self.m
         rotationAngle = np.deg2rad(calcSettings.rotateDeg)
         
         x = self.x   / CONSTANTS.MM_SI_TO_AU
@@ -338,12 +352,19 @@ class Particle:
         
         # Calculate momentum
         if spectrometer.gyrationPeriod is not None and spectrometer.gyrationPeriod != 0:
-            px = omega * 0.5 * (x / np.tan(omega * t * 0.5) - y)
-            py = omega * 0.5 * (y / np.tan(omega * t * 0.5) + x) * self._mirrorYElectron
+            px = self.m*omega * 0.5 * (x / np.tan(omega * t * 0.5) - y)
+            py = self.m*omega * 0.5 * (y / np.tan(omega * t * 0.5) + x) * self._mirrorYElectron
         else:
             px = self.m * x / t
             py = self.m * y / t
-        pz = self._calcZMomentum(tof=t, spectrometer=spectrometer, calcSettings=calcSettings)
+        pz = self._calcZMomentum(tof=t, spectrometer=spectrometer, calcSettings=calcSettings) * self._mirrorYElectron
+
+        # Removing nan
+        indexes = np.isfinite(pz)
+        px = px[indexes]
+        py = py[indexes]
+        pz = pz[indexes]
+        indexes = None
         
         # Shift momentum
         px += calcSettings.shiftPX
@@ -378,10 +399,13 @@ class Particle:
             raise Exception("Spectrometer not sufficiently defined")
         if len(spectrometer) == 1:
             # Linear case
+            print("Linear Case!")
             length, field = spectrometer[0]
-            if length is None or length == 0:
+            if length is None:
+                print("Linear Approximation!")
                 # Linear Approximation
-                return field * (tof - self.tofMean) / 124.38
+                print(field*CONSTANTS.VCM_SI_TO_AU, tof* CONSTANTS.NS_SI_TO_AU, self.tofMean)
+                return field*CONSTANTS.VCM_SI_TO_AU * (tof* CONSTANTS.NS_SI_TO_AU - self.tofMean)  / 124.38
             return length * self.m / tof - 0.5 * (field * self._electricFieldPolarity) * self.q * tof
         if len(spectrometer) == 2:
             if spectrometer[1][1] == 0.:
@@ -395,11 +419,10 @@ class Particle:
                 
                 # calculate velocity
                 v = (-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + np.sqrt((-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**2 + 4*(24*a*q*t**2*s_B - (a*q*t**2 - 2*s)**2)**3) + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**(1./3.)/(6*2**(1./3.)*t) - (24*a*q*t**2*s_B - (a*q*t**2 - 2*s)**2)/(3*2**(2./3.)*t*(-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + np.sqrt((-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**2 + 4*(24*a*q*t**2*s_B - (a*q*t**2 - 2*s)**2)**3) + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**(1./3.)) - (a*q*t**2 - 2*s)/(6*t)
-                print(np.sum(np.imag(v)!=0), v)
-                test = (-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**2 + 4*(24*a*q*t**2*s_B - (a*q*t**2 - 2*s)**2)**3
-                print(np.min(test), test)
+                #print(np.sum(np.imag(v)!=0.), v, np.imag(v)!=0)
                 vReal = np.array(np.real(v), dtype=self._dtype)
                 vReal[np.imag(v)!=0] = None
+                print(len(v), np.sum(np.imag(v)!=0))
                 return m*vReal
             else:
                 raise NotImplementedError("z-Momentum calculation not implemented for 2-regions spectrometer, when the field of the second region is not zero.")
@@ -435,6 +458,7 @@ class Ion(Particle):
                        tof:          Optional[np.ndarray]           = None, \
                        m:            Optional[np.ndarray|int|float] = None, \
                        q:            Optional[np.ndarray|int|float] = None, \
+                       tofMean:      Optional[float]                = None, \
                        px:           Optional[np.ndarray]           = None, \
                        py:           Optional[np.ndarray]           = None, \
                        pz:           Optional[np.ndarray]           = None, \
@@ -446,10 +470,12 @@ class Ion(Particle):
                        dtype:  np.typing.DTypeLike                  = np.double, \
                        ctype:  np.typing.DTypeLike                  = np.cdouble, \
                 ) -> None:
+        m *= CONSTANTS.U_SI_TO_KG_SI
+        m /= CONSTANTS.ME_SI_TO_AU
         super().__init__(x=x, y=y, tof=tof, m=m, q=q, px=px, py=py, pz=py, \
                          p=p, energy=energy, spectrometer=spectrometer,    \
                          calcSettings=calcSettings, isIonSide=isIonSide,   \
-                         dtype=dtype, ctype=ctype)
+                         dtype=dtype, ctype=ctype, tofMean=tofMean)
                
 class ParticleList:
     from typing import Optional
@@ -547,6 +573,7 @@ class Reaction:
     
     def add_ion(self, x: np.ndarray, y: np.ndarray, tof: np.ndarray, \
                       m: np.ndarray|float|int, q: np.ndarray|float|int, \
+                      tofMean:      Optional[float|int]    = None, \
                       spectrometer: Optional[Spectrometer] = None, \
                       calcSettings: Optional[CalcSettings] = None, *,\
                       dtype:  np.typing.DTypeLike           = np.double, \
@@ -558,7 +585,7 @@ class Reaction:
                 calcSettings = self._ionsCalcSettings
             else:
                 calcSettings = CalcSettings()
-        self._ionsArr += Ion(x=x, y=y, tof=tof, m=m, q=q, spectrometer=spectrometer, calcSettings=calcSettings, dtype=dtype, ctype=ctype)
+        self._ionsArr += Ion(x=x, y=y, tof=tof, m=m, q=q, tofMean=tofMean, spectrometer=spectrometer, calcSettings=calcSettings, dtype=dtype, ctype=ctype)
 
     def add_elec(self, x: np.ndarray, y: np.ndarray, tof: np.ndarray, \
                        spectrometer: Optional[Spectrometer] = None, \
