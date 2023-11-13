@@ -429,6 +429,28 @@ class Particle:
         if len(spectrometer) >= 3:
             raise NotImplementedError("z-Momentum calculation not implemented for spectrometers with three or more regions.")
 
+    def __mul__(self, other: Particle) -> float:
+        if not isinstance(other, Particle):
+            raise NotImplementedError
+        
+        return self.px*other.px + self.py*other.py + self.pz*other.pz
+    
+    def __add__(self, other: Particle|List[float, float, float]) -> Particle:
+        if isinstance(other, Particle):
+            return Particle(px=self.px+other.px, py=self.py+other.py, pz=self.pz+other.pz)
+        elif isinstance(other, List):
+            return Particle(px=self.px+other[0], py=self.py+other[1], pz=self.pz+other[2])
+        else
+            raise NotImplementedError
+    
+    def __sub__(self, other: Particle|List[float, float, float]) -> Particle:
+        if isinstance(other, Particle):
+            return Particle(px=self.px-other.px, py=self.py-other.py, pz=self.pz-other.pz)
+        elif isinstance(other, List):
+            return Particle(px=self.px-other[0], py=self.py-other[1], pz=self.pz-other[2])
+        else
+            raise NotImplementedError
+
 class Electron(Particle):
     from typing import Optional
     import numpy as np
