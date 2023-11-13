@@ -276,8 +276,13 @@ class Particle:
         """
         absolute momentum of particle in a.u.
         """
-        if self._p is None or self._recalculateMomentum:
+
+        from numpy import sqrt
+
+        if self._recalculateMomentum:
             self.calcMomentum()
+        if self._p is None:
+            self._p = sqrt(self.px**2 + self.py**2 + self.pz**2)
         return self._p
     @property
     def energy(self) -> np.ndarray:
