@@ -137,6 +137,7 @@ class Particle:
                        spectrometer: Optional[Spectrometer]         = None, \
                        calcSettings: Optional[CalcSettings]         = None, \
                        isIonSide: bool                              = True, \
+                       recalcualteMomentum: bool                    = True, \
                        dtype:  np.typing.DTypeLike                  = np.double, \
                        ctype:  np.typing.DTypeLike                  = np.cdouble, \
                 ) -> None:
@@ -154,7 +155,7 @@ class Particle:
         self._energy = None if energy is None else np.array(energy, dtype=dtype) # eV
         
         self._spectrometer          = spectrometer
-        self._recalculateMomentum   = True
+        self._recalculateMomentum   = recalcualteMomentum
         self._electricFieldPolarity = 1 if isIonSide else -1
         self._mirrorYElectron       = 1 if isIonSide else -1
         self._calcSettings          = calcSettings
@@ -440,17 +441,17 @@ class Particle:
     
     def __add__(self, other: Particle|List[float, float, float]) -> Particle:
         if isinstance(other, Particle):
-            return Particle(px=self.px+other.px, py=self.py+other.py, pz=self.pz+other.pz)
+            return Particle(px=self.px+other.px, py=self.py+other.py, pz=self.pz+other.pz, recalcualteMomentum=False)
         elif isinstance(other, list):
-            return Particle(px=self.px+other[0], py=self.py+other[1], pz=self.pz+other[2])
+            return Particle(px=self.px+other[0], py=self.py+other[1], pz=self.pz+other[2], recalcualteMomentum=False)
         else:
             raise NotImplementedError
     
     def __sub__(self, other: Particle|List[float, float, float]) -> Particle:
         if isinstance(other, Particle):
-            return Particle(px=self.px-other.px, py=self.py-other.py, pz=self.pz-other.pz)
+            return Particle(px=self.px-other.px, py=self.py-other.py, pz=self.pz-other.pz, recalcualteMomentum=False)
         elif isinstance(other, list):
-            return Particle(px=self.px-other[0], py=self.py-other[1], pz=self.pz-other[2])
+            return Particle(px=self.px-other[0], py=self.py-other[1], pz=self.pz-other[2], recalcualteMomentum=False)
         else:
             raise NotImplementedError
 
