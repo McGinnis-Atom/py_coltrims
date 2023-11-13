@@ -440,7 +440,7 @@ class Particle:
             return Particle(px=self.px+other.px, py=self.py+other.py, pz=self.pz+other.pz)
         elif isinstance(other, List):
             return Particle(px=self.px+other[0], py=self.py+other[1], pz=self.pz+other[2])
-        else
+        else:
             raise NotImplementedError
     
     def __sub__(self, other: Particle|List[float, float, float]) -> Particle:
@@ -448,7 +448,7 @@ class Particle:
             return Particle(px=self.px-other.px, py=self.py-other.py, pz=self.pz-other.pz)
         elif isinstance(other, List):
             return Particle(px=self.px-other[0], py=self.py-other[1], pz=self.pz-other[2])
-        else
+        else:
             raise NotImplementedError
 
 class Electron(Particle):
