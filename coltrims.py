@@ -121,7 +121,7 @@ class CalcSettings:
 
 class Particle:
     import numpy as np
-    from typing import Optional
+    from typing import Optional, List
     
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \
