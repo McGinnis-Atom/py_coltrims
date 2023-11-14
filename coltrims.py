@@ -643,3 +643,15 @@ class Reaction:
         if applyToAll:
             for electron in self._elecArr:
                 electron.spectrometer = spectrometer
+
+    def setIonSettings(self, settings: CalcSettings, applyToAll: bool = True):
+        self._ionsCalcSettings = settings
+        if applyToAll:
+            for ion in self._ionsArr:
+                ion.calcSettings = settings
+    
+    def setElectronSettings(self, settings: CalcSettings, applyToAll: bool = True):
+        self._elecCalcSettings = settings
+        if applyToAll:
+            for electron in self._elecArr:
+                electron.calcSettings = settings
