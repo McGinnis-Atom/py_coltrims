@@ -14,7 +14,7 @@ class TestClass:
         assert len(spec) == 0
         assert spec.gyrationPeriod is None
         assert spec.magneticField is None
-        assert spec.returnAU == True
+        assert spec.returnAU is True
     
     def test_spectrometer_addRegion(self):
         import coltrims
@@ -24,7 +24,7 @@ class TestClass:
         assert len(spec) == 0
         assert spec.gyrationPeriod is None
         assert spec.magneticField is None
-        assert spec.returnAU == True
+        assert spec.returnAU is True
 
         valA, valB = 2, 4
         spec.addRegion(valA, valB)
@@ -72,7 +72,7 @@ class TestClass:
         assert len(spec) == 0
         assert spec.gyrationPeriod is None
         assert spec.magneticField is None
-        assert spec.returnAU == True
+        assert spec.returnAU is True
 
         val = 5
         spec.gyrationPeriod = val
@@ -86,7 +86,7 @@ class TestClass:
         assert len(spec) == 0
         assert spec.gyrationPeriod is None
         assert spec.magneticField is None
-        assert spec.returnAU == True
+        assert spec.returnAU is True
 
         val = 5
         spec.magneticField = val
