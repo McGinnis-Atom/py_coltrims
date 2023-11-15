@@ -410,7 +410,7 @@ class Particle:
             if length is None:
                 #print("Linear Approximation!")
                 # Linear Approximation
-                print(field*CONSTANTS.VCM_SI_TO_AU, tof* CONSTANTS.NS_SI_TO_AU, self.tofMean)
+                #print(field*CONSTANTS.VCM_SI_TO_AU, tof* CONSTANTS.NS_SI_TO_AU, self.tofMean)
                 return field*CONSTANTS.VCM_SI_TO_AU * (tof* CONSTANTS.NS_SI_TO_AU - self.tofMean)  / 124.38
             return length * self.m / tof - 0.5 * (field * self._electricFieldPolarity) * self.q * tof
         if len(spectrometer) == 2:
