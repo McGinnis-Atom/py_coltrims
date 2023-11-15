@@ -405,10 +405,10 @@ class Particle:
             raise Exception("Spectrometer not sufficiently defined")
         if len(spectrometer) == 1:
             # Linear case
-            print("Linear Case!")
+            #print("Linear Case!")
             length, field = spectrometer[0]
             if length is None:
-                print("Linear Approximation!")
+                #print("Linear Approximation!")
                 # Linear Approximation
                 print(field*CONSTANTS.VCM_SI_TO_AU, tof* CONSTANTS.NS_SI_TO_AU, self.tofMean)
                 return field*CONSTANTS.VCM_SI_TO_AU * (tof* CONSTANTS.NS_SI_TO_AU - self.tofMean)  / 124.38
@@ -428,7 +428,7 @@ class Particle:
                 #print(np.sum(np.imag(v)!=0.), v, np.imag(v)!=0)
                 vReal = np.array(np.real(v), dtype=self._dtype)
                 vReal[np.imag(v)!=0] = None
-                print(len(v), np.sum(np.imag(v)!=0))
+                #print(len(v), np.sum(np.imag(v)!=0))
                 return m*vReal
             else:
                 raise NotImplementedError("z-Momentum calculation not implemented for 2-regions spectrometer, when the field of the second region is not zero.")
