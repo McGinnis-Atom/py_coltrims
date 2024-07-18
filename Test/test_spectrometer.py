@@ -2,7 +2,7 @@ def almostEqual(a, b):
     import numpy as np
     return np.abs(a - b) < 1e-3
 
-class TestClass:
+class TestSpectrometer:
     import coltrims
     import numpy as np
     
