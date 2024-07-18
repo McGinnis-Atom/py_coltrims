@@ -1,6 +1,30 @@
 from __future__ import annotations
 from Constants import CONSTANTS
+from numba.experimental import jitclass
+from numba import boolean, int64, float64
 
+
+@jitclass([
+    ("shiftX", float64),
+    ("shiftY", float64),
+    ("shiftTOF", float64),
+    ("stretchX", float64),
+    ("stretchY", float64),
+    ("stretchTotal", float64),
+    ("rotateDeg", float64),
+    ("mirrorX", boolean),
+    ("mirrorY", boolean),
+    ("shiftPX", float64),
+    ("shiftPY", float64),
+    ("shiftPZ", float64),
+    ("stretchPX", float64),
+    ("stretchPY", float64),
+    ("stretchPZ", float64),
+    ("stretchPTotal", float64),
+    ("mirrorPX", boolean),
+    ("mirrorPY", boolean),
+    ("shiftThenRotate", boolean),
+])
 class CalcSettings:
     def __init__(self, shiftX:    float = 0.   , shiftY:    float = 0.,    shiftTOF:     float = 0.,    \
                        stretchX:  float = 1.   , stretchY:  float = 1.,    stretchTotal: float = 1.,    \
