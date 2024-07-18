@@ -1,5 +1,5 @@
 from __future__ import annotations
-from Constants import CONSTANTS
+import CONSTANTS
 from Spectrometer import Spectrometer
 from CalcSettings import CalcSettings
 from Particle import ParticleList, Particle, Electron, Ion

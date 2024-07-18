@@ -1,5 +1,5 @@
 from __future__ import annotations
-from Constants import CONSTANTS
+import CONSTANTS
 from numba.experimental import jitclass
 from numba import boolean, int64, float64
 

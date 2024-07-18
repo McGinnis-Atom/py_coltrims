@@ -1,5 +1,5 @@
 from __future__ import annotations
-from Constants import CONSTANTS
+import CONSTANTS
 from Particle import Particle
 
 class CoordinateSystem:
