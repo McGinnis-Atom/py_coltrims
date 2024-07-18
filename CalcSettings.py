@@ -36,7 +36,7 @@ class CalcSettings:
                 
         self.shiftX               = shiftX          # mm
         self.shiftY               = shiftY          # mm
-        self.shiftTOF=self.shiftT = shiftTOF        # ns
+        self.shiftTOF             = shiftTOF        # ns
         self.stretchX             = stretchX        # 1
         self.stretchY             = stretchY        # 1
         self.stretchTotal         = stretchTotal    # 1
@@ -53,3 +53,7 @@ class CalcSettings:
         self.mirrorPX             = mirrorPX        # bool
         self.mirrorPY             = mirrorPY        # bool
         self.shiftThenRotate      = shiftThenRotate # bool
+
+    @property
+    def shiftT(self):
+        return self.shiftTOF

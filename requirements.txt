@@ -3,4 +3,4 @@ pandas
 typing
 matplotlib
 ipympl
-numba
+numba>=0.60.0

@@ -1,9 +1,10 @@
+import coltrims
+
 def almostEqual(a, b):
     import numpy as np
     return np.abs(a - b) < 1e-3
 
 class TestSpectrometer:
-    import coltrims
     import numpy as np
     
     def test_spectrometer_creation(self):
@@ -17,7 +18,6 @@ class TestSpectrometer:
         assert spec.returnAU is True
     
     def test_spectrometer_addRegion(self):
-        import coltrims
         spec = coltrims.Spectrometer()
 
         assert isinstance(spec, coltrims.Spectrometer)
@@ -41,7 +41,6 @@ class TestSpectrometer:
             break
     
     def test_spectrometer_addRegion_noAU(self):
-        import coltrims
         spec = coltrims.Spectrometer()
         spec.returnAU = False
 
@@ -66,7 +65,6 @@ class TestSpectrometer:
             break
         
     def test_spectrometer_gyration_period(self):
-        import coltrims
         spec = coltrims.Spectrometer()
         assert isinstance(spec, coltrims.Spectrometer)
         assert len(spec) == 0
@@ -80,7 +78,6 @@ class TestSpectrometer:
         assert almostEqual(spec.magneticField,coltrims.CONSTANTS.GAUSS_TO_NS(val))
         
     def test_spectrometer_magnetic_field(self):
-        import coltrims
         spec = coltrims.Spectrometer()
         assert isinstance(spec, coltrims.Spectrometer)
         assert len(spec) == 0
