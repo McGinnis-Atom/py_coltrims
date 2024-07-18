@@ -200,3 +200,19 @@ class Spectrometer_jit(Spectrometer):
         self.lengths[self.len] = length
         self.electricFields[self.len] = electricField
         self.len += 1
+
+class Spectrometer_leagacy(Spectrometer):
+    def __iter__(self):
+        self.iterIndex = 0
+        return self
+    
+    def __next__(self):
+        if self.iterIndex < len(self):
+            if self.returnAU:
+                val = (None if self.lengths[self.iterIndex] is None else self.lengths[self.iterIndex]/CONSTANTS.MM_SI_TO_AU, None if self.electricFields[self.iterIndex] is None else self.electricFields[self.iterIndex]/CONSTANTS.VCM_SI_TO_AU)
+            else:
+                val = (self.lengths[self.iterIndex], self.electricFields[self.iterIndex])
+            self.iterIndex += 1
+            return val
+        else:
+            raise StopIteration
