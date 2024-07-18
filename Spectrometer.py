@@ -27,20 +27,20 @@ class Spectrometer:
     def __len__(self):
         return len(self.lengths)
     
-    def __iter__(self):
-        self.iterIndex = 0
-        return self
+    #def __iter__(self):
+    #    self.iterIndex = 0
+    #    return self
     
-    def __next__(self):
-        if self.iterIndex < len(self):
-            if self.returnAU:
-                val = (None if self.lengths[self.iterIndex] is None else self.lengths[self.iterIndex]/CONSTANTS.MM_SI_TO_AU, None if self.electricFields[self.iterIndex] is None else self.electricFields[self.iterIndex]/CONSTANTS.VCM_SI_TO_AU)
-            else:
-                val = (self.lengths[self.iterIndex], self.electricFields[self.iterIndex])
-            self.iterIndex += 1
-            return val
-        else:
-            raise StopIteration
+    #def __next__(self):
+    #    if self.iterIndex < len(self):
+    #        if self.returnAU:
+    #            val = (None if self.lengths[self.iterIndex] is None else self.lengths[self.iterIndex]/CONSTANTS.MM_SI_TO_AU, None if self.electricFields[self.iterIndex] is None else self.electricFields[self.iterIndex]/CONSTANTS.VCM_SI_TO_AU)
+    #        else:
+    #            val = (self.lengths[self.iterIndex], self.electricFields[self.iterIndex])
+    #        self.iterIndex += 1
+    #        return val
+    #    else:
+    #        raise StopIteration
     
     def __getitem__(self, index):
         if not isinstance(index, int):
@@ -94,7 +94,7 @@ class Spectrometer:
     ("maxLength", int32),
     ("len", int32)
 ])
-class Spectrometer_jit():
+class Spectrometer_jit(Spectrometer):
     def __init__(self, lengths:        Optional[List[float|int]] = None, \
                        electricFields:  Optional[List[float|int]] = None, \
                        gyrationPeriod: Optional[float|int]       = None, \
