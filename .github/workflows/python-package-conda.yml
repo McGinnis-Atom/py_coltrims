@@ -73,6 +73,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - name: check conda
+      run: |
+          echo ${CONDA}
+          ${CONDA}/bin/conda --version
     - name: Add conda to system path
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
