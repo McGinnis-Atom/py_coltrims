@@ -1,12 +1,13 @@
 import coltrims
 
+
 def almostEqual(a, b):
     import numpy as np
     return np.abs(a - b) < 1e-3
 
 class TestSpectrometer:
     import numpy as np
-    
+
     def test_spectrometer_creation(self):
         import coltrims
         spec = coltrims.Spectrometer()
@@ -16,7 +17,7 @@ class TestSpectrometer:
         assert spec.gyrationPeriod is None
         assert spec.magneticField is None
         assert spec.returnAU is True
-    
+
     def test_spectrometer_addRegion(self):
         spec = coltrims.Spectrometer()
 
@@ -30,7 +31,7 @@ class TestSpectrometer:
         spec.addRegion(valA, valB)
 
         assert len(spec) == 1
-        
+
         a, b = spec[0]
         assert a == valA / coltrims.CONSTANTS.MM_SI_TO_AU
         assert b == valB / coltrims.CONSTANTS.VCM_SI_TO_AU
@@ -39,7 +40,7 @@ class TestSpectrometer:
             assert a == valA / coltrims.CONSTANTS.MM_SI_TO_AU
             assert b == valB / coltrims.CONSTANTS.VCM_SI_TO_AU
             break
-    
+
     def test_spectrometer_addRegion_noAU(self):
         spec = coltrims.Spectrometer()
         spec.returnAU = False
@@ -54,7 +55,7 @@ class TestSpectrometer:
         spec.addRegion(valA, valB)
 
         assert len(spec) == 1
-        
+
         a, b = spec[0]
         assert a == valA
         assert b == valB
@@ -63,7 +64,7 @@ class TestSpectrometer:
             assert a == valA
             assert b == valB
             break
-        
+
     def test_spectrometer_gyration_period(self):
         spec = coltrims.Spectrometer()
         assert isinstance(spec, coltrims.Spectrometer)
@@ -76,7 +77,7 @@ class TestSpectrometer:
         spec.gyrationPeriod = val
         assert almostEqual(spec.gyrationPeriod,val)
         assert almostEqual(spec.magneticField,coltrims.CONSTANTS.GAUSS_TO_NS(val))
-        
+
     def test_spectrometer_magnetic_field(self):
         spec = coltrims.Spectrometer()
         assert isinstance(spec, coltrims.Spectrometer)
@@ -96,4 +97,3 @@ TODO:
     - Add test for CalcSettings
     - Add test for Reaction
 """
-
