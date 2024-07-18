@@ -1,3 +1,6 @@
+from __future__ import annotations
+from Constants import CONSTANTS
+
 class CalcSettings:
     def __init__(self, shiftX:    float = 0.   , shiftY:    float = 0.,    shiftTOF:     float = 0.,    \
                        stretchX:  float = 1.   , stretchY:  float = 1.,    stretchTotal: float = 1.,    \
