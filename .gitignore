@@ -1,0 +1,5 @@
+*.pyc
+*.vsidx
+__pycache__
+.pytest_cache
+.vs
