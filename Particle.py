@@ -4,11 +4,10 @@ from Spectrometer import Spectrometer, Spectrometer_jit
 from CalcSettings import CalcSettings
 from numba.experimental import jitclass
 from numba import boolean, int64, float64
+from typing import Optional, List
+import numpy as np
 
-class Particle:
-    import numpy as np
-    from typing import Optional, List
-    
+class Particle:    
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \
                        tof:          Optional[np.ndarray]           = None, \
@@ -365,8 +364,6 @@ class Particle:
 
 
 class Electron(Particle):
-    from typing import Optional
-    import numpy as np
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \
                        tof:          Optional[np.ndarray]           = None, \
@@ -388,8 +385,6 @@ class Electron(Particle):
 
 
 class Ion(Particle):
-    from typing import Optional
-    import numpy as np
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \
                        tof:          Optional[np.ndarray]           = None, \
@@ -417,7 +412,6 @@ class Ion(Particle):
                          
 
 class ParticleList:
-    from typing import Optional
     def __init__(self, particles: Optional[list[Particle]] = None):
         self.particles = list() if particles is None else particles
     
@@ -469,6 +463,7 @@ class ParticleList:
 
 
 @jitclass([
+    ("_recalculateMomentum", boolean),
     ("_x", float64[:]),
     ("_y", float64[:]),
     ("_tof", float64),
@@ -480,15 +475,13 @@ class ParticleList:
     ("_pz", float64[:]),
     ("_p", float64[:]),
     ("_energy", float64[:]),
-    ("_spectrometer", Spectrometer_jit),
-    ("_calcSettings", CalcSettings),
+    ("_spectrometer", Spectrometer_jit.class_type.instance_type),
+    ("_calcSettings", CalcSettings.class_type.instance_type),
     ("_electricFieldPolarity", int64),
     ("_mirrorYElectron", int64),
     ("_recalculateMomentum", boolean)
 ])
-class Particle:
-    import numpy as np
-    from typing import Optional, List
+class Particle_jit:
     
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \

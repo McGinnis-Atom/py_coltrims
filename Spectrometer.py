@@ -96,7 +96,7 @@ class Spectrometer:
 ])
 class Spectrometer_jit(Spectrometer):
     def __init__(self, lengths:        Optional[List[float|int]] = None, \
-                       electricFields:  Optional[List[float|int]] = None, \
+                       electricFields: Optional[List[float|int]] = None, \
                        gyrationPeriod: Optional[float|int]       = None, \
                        magneticField:  Optional[float|int]       = None, \
                        maxLength: int = 4
