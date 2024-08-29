@@ -3,3 +3,14 @@
 __pycache__
 .pytest_cache
 .vs
+/__pycache__/CalcSettings.cpython-311.pyc
+/__pycache__/Constants.cpython-311.pyc
+/__pycache__/coltrims.cpython-311.pyc
+/__pycache__/CoordinateSystem.cpython-311.pyc
+/__pycache__/Particle.cpython-311.pyc
+/__pycache__/Reaction.cpython-311.pyc
+/__pycache__/Spectrometer.cpython-311.pyc
+/__pycache__/test_CalcSetting.cpython-311-pytest-7.4.3.pyc
+/__pycache__/test_spectrometer.cpython-311-pytest-7.4.3.pyc
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
