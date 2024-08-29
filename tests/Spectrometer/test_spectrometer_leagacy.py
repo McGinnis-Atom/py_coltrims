@@ -4,13 +4,13 @@ import coltrims
 def almostEqual(a, b):
     import numpy as np
     return np.abs(a - b) < 1e-3
-
-class TestSpectrometer:
+    
+class TestSpectrometer_leagacy:
     import numpy as np
 
     def test_spectrometer_creation(self):
         import coltrims
-        spec = coltrims.Spectrometer()
+        spec = coltrims.Spectrometer_leagacy()
 
         assert isinstance(spec, coltrims.Spectrometer)
         assert len(spec) == 0
@@ -19,7 +19,7 @@ class TestSpectrometer:
         assert spec.returnAU is True
 
     def test_spectrometer_addRegion(self):
-        spec = coltrims.Spectrometer()
+        spec = coltrims.Spectrometer_leagacy()
 
         assert isinstance(spec, coltrims.Spectrometer)
         assert len(spec) == 0
@@ -42,7 +42,7 @@ class TestSpectrometer:
             break
 
     def test_spectrometer_addRegion_noAU(self):
-        spec = coltrims.Spectrometer()
+        spec = coltrims.Spectrometer_leagacy()
         spec.returnAU = False
 
         assert isinstance(spec, coltrims.Spectrometer)
@@ -66,7 +66,7 @@ class TestSpectrometer:
             break
 
     def test_spectrometer_gyration_period(self):
-        spec = coltrims.Spectrometer()
+        spec = coltrims.Spectrometer_leagacy()
         assert isinstance(spec, coltrims.Spectrometer)
         assert len(spec) == 0
         assert spec.gyrationPeriod is None
@@ -79,7 +79,7 @@ class TestSpectrometer:
         assert almostEqual(spec.magneticField,coltrims.CONSTANTS.GAUSS_TO_NS(val))
 
     def test_spectrometer_magnetic_field(self):
-        spec = coltrims.Spectrometer()
+        spec = coltrims.Spectrometer_leagacy()
         assert isinstance(spec, coltrims.Spectrometer)
         assert len(spec) == 0
         assert spec.gyrationPeriod is None
@@ -90,3 +90,9 @@ class TestSpectrometer:
         spec.magneticField = val
         assert almostEqual(spec.magneticField,val)
         assert almostEqual(spec.gyrationPeriod,coltrims.CONSTANTS.GAUSS_TO_NS(val))
+
+"""
+TODO:
+    - Add test for paticle
+    - Add test for Reaction
+"""
