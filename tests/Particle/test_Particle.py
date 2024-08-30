@@ -28,6 +28,7 @@ class TestColtrims:
         assert p._tofMean == None
         assert p._dtype == np.double
         assert p._ctype == np.cdouble
+        assert p._name == "Particle_(m={m}, q={q})"
 
     def test_nonDefault(self):
         spec = coltrims.Spectrometer()
@@ -49,6 +50,7 @@ class TestColtrims:
             calcSettings = cSet,
             isIonSide = False,
             recalculateMomentum = False,
+            name = "Hi"
         )
         assert all(p._x == [0,1,2])
         assert all(p._y == [0,1,2])
@@ -68,6 +70,7 @@ class TestColtrims:
         assert p._tofMean == 1000.
         assert p._dtype == np.double
         assert p._ctype == np.cdouble
+        assert p._name == "Hi"
     
     def test_setUpdateMomentum(self):
         p = coltrims.Particle(recalculateMomentum = False)
@@ -269,3 +272,28 @@ class TestColtrims:
         assert isinstance(p._energy, np.ndarray)
         assert all(p._energy == [0.000879467036578225,1.4214075258966805,2.5278261797417874])
         assert p._recalculateMomentum == False
+
+    def test_name(self):
+        spec = coltrims.Spectrometer()
+        spec.addRegion(None, 1)
+        p = coltrims.Particle(
+            x = [0,1,-2],
+            y = [0,-1,2],
+            tof = [1,2,3],
+            m = 1,
+            q = 1,
+            tofMean = 2,
+            spectrometer = spec,
+            calcSettings = coltrims.CalcSettings()
+        )
+
+        assert p._name == "Particle_(m={m}, q={q})"
+        assert p.name == "Particle_(m=1.0, q=1.0)"
+
+        p.name = "Hi"
+        assert p._name == "Hi"
+        assert p.name == "Hi"
+
+        p.name = "{m} {q} {energy} {p}"
+        assert p._name == "{m} {q} {energy} {p}"
+        assert p.name == "1.0 1.0 [8.79467037e-04 1.42140753e+00 2.52782618e+00] [0.00803988 0.32322055 0.43103573]"

@@ -25,6 +25,7 @@ class Particle:
                        recalculateMomentum: bool                    = True, \
                        dtype:  np.typing.DTypeLike                  = np.double, \
                        ctype:  np.typing.DTypeLike                  = np.cdouble, \
+                       name: str                                    = "Particle_(m={m}, q={q})"
                 ) -> None:
         import numpy as np
         self._x      = None if x      is None else np.array(x, dtype=dtype)      # mm
@@ -49,9 +50,18 @@ class Particle:
         
         self._dtype = dtype
         self._ctype = ctype
+
+        self._name = name
     
     def setUpdateMomentum(self):
         self._recalculateMomentum = True
+
+    @property
+    def name(self) -> str:
+        return self._name.format(m=self.m, q=self.q, energy=self.energy, p=self.p)
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
     
     @property
     def tofMean(self) -> float:
