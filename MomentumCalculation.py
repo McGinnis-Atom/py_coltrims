@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, List
 import numpy as np
 from Spectrometer import Spectrometer, Spectrometer_jit
 from CalcSettings import CalcSettings
@@ -95,7 +97,7 @@ def calcZMomentum(
     q: int|float,
     spectrometer: Spectrometer, 
     calcSettings: CalcSettings,
-    tofMean: float|None,
+    tofMean: Optional[float],
     electricFieldPolarity: int|float,
     ) -> np.ndarray:
 
