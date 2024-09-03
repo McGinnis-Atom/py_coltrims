@@ -5,7 +5,9 @@ from CalcSettings import CalcSettings
 from numba.experimental import jitclass
 from numba import boolean, int64, float64
 from typing import Optional, List
+from numpy import ndarray
 import numpy as np
+import warnings
 
 class Particle:    
     def __init__(self, x:            Optional[np.ndarray]           = None, \
@@ -27,7 +29,6 @@ class Particle:
                        ctype:  np.typing.DTypeLike                  = np.cdouble, \
                        name: str                                    = "Particle_(m={m}, q={q})"
                 ) -> None:
-        import numpy as np
         self._x      = None if x      is None else np.array(x, dtype=dtype)      # mm
         self._y      = None if y      is None else np.array(y, dtype=dtype)      # mm
         self._tof    = None if tof    is None else np.array(tof, dtype=dtype)    # ns
@@ -366,6 +367,7 @@ class Particle:
     
     def __array__(self):
         import numpy as np
+        warnings.warn("This methode will be removed in the switch to jit class", DeprecationWarning, 2)
         return np.array([self.px, self.py, self.pz])
     
     def __len__(self):
@@ -509,26 +511,40 @@ class Particle_jit:
                        isIonSide: bool                              = True, \
                        recalculateMomentum: bool                    = True, \
                 ) -> None:
-        import numpy as np
-        self._x      = None if x      is None else np.array(x, dtype=np.float64)      # mm
-        self._y      = None if y      is None else np.array(y, dtype=np.float64)      # mm
-        self._tof    = None if tof    is None else np.array(tof, dtype=np.float64)    # ns
-        self._q      = None if q      is None else np.array(q, dtype=np.float64)      # a.u.
-        self._m      = None if m      is None else np.array(m, dtype=np.float64)      # a.u.
-                                                                    # 
-        self._px     = None if px     is None else np.array(px, dtype=np.float64)     # a.u.
-        self._py     = None if py     is None else np.array(py, dtype=np.float64)     # a.u.
-        self._pz     = None if pz     is None else np.array(pz, dtype=np.float64)     # a.u.
-        self._p      = None if p      is None else np.array(p, dtype=np.float64)      # a.u.
-        self._energy = None if energy is None else np.array(energy, dtype=np.float64) # eV
+        if x is not None:
+            self._x = np.array(x, dtype=np.float64) # mm
+        if y is not None:
+            self._y = np.array(y, dtype=np.float64) # mm   
+        if tof is not None:
+            self._tof = np.array(tof, dtype=np.float64)    # ns
+        if q is not None:
+            self._q = np.array(q, dtype=np.float64)      # a.u.
+        if m is not None:
+            self._m      = np.array(m, dtype=np.float64)      # a.u.
+        if px is not None:
+            self._px     = np.array(px, dtype=np.float64)     # a.u.
+        if py is not None:
+            self._py     = np.array(py, dtype=np.float64)     # a.u.
+        if pz is not None:
+            self._pz     = np.array(pz, dtype=np.float64)     # a.u.
+        if p is not None:
+            self._p      = np.array(p, dtype=np.float64)      # a.u.
+        if energy is not None:
+            self._energy = np.array(energy, dtype=np.float64) # eV
         
-        self._spectrometer          = spectrometer
+        if spectrometer is not None:
+            self._spectrometer          = spectrometer
         self._recalculateMomentum   = recalculateMomentum
         self._electricFieldPolarity = 1 if isIonSide else -1
         self._mirrorYElectron       = 1 if isIonSide else -1
-        self._calcSettings          = calcSettings
+        if calcSettings is not None:
+            self._calcSettings          = calcSettings
+        if tofMean is not None:
+            self._tofMean = tofMean
 
-        self._tofMean = tofMean
+        
+        self._dtype = np.double
+        self._ctype = np.cdouble
     
     def setUpdateMomentum(self):
         self._recalculateMomentum = True
@@ -680,7 +696,6 @@ class Particle_jit:
     def calcMomentum(self, spectrometer: Optional[Spectrometer] = None, \
                            calcSettings: Optional[CalcSettings] = None  \
                     ) -> None:
-        import numpy as np
         if spectrometer is None:
             spectrometer = self.spectrometer
         if calcSettings is None:
@@ -765,7 +780,6 @@ class Particle_jit:
                              spectrometer: Spectrometer = None, \
                              calcSettings: CalcSettings = None, \
                        ) -> None:
-        import numpy as np
         if len(spectrometer) == 0:
             raise Exception("Spectrometer not sufficiently defined")
         if len(spectrometer) == 1:
@@ -801,7 +815,6 @@ class Particle_jit:
             raise NotImplementedError("z-Momentum calculation not implemented for spectrometers with three or more regions.")
 
     def __mul__(self, other: Particle|List[float, float, float]|np.ndarray) -> float:
-        from numpy import ndarray
         if isinstance(other,Particle):
             return self.px*other.px + self.py*other.py + self.pz*other.pz
         elif isinstance(other, list) or isinstance(other, ndarray):
@@ -813,7 +826,6 @@ class Particle_jit:
         
     
     def __add__(self, other: Particle|List[float, float, float]|np.ndarray) -> Particle:
-        from numpy import ndarray
         if isinstance(other, Particle):
             return Particle(px=self.px+other.px, py=self.py+other.py, pz=self.pz+other.pz, recalculateMomentum=False)
         elif isinstance(other, list) or isinstance(other, ndarray):
@@ -824,7 +836,6 @@ class Particle_jit:
         return self.__add__(other)
     
     def __sub__(self, other: Particle|List[float, float, float]|np.ndarray) -> Particle:
-        from numpy import ndarray
         if isinstance(other, Particle):
             return Particle(px=self.px-other.px, py=self.py-other.py, pz=self.pz-other.pz, recalculateMomentum=False)
         elif isinstance(other, list) or isinstance(other, ndarray):
@@ -833,10 +844,6 @@ class Particle_jit:
             raise NotImplementedError
     def __rsub__(self, other):
         return self.__sub__(other)
-    
-    def __array__(self):
-        import numpy as np
-        return np.array([self.px, self.py, self.pz])
     
     def __len__(self):
         return len(self.px)
