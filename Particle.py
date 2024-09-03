@@ -8,13 +8,14 @@ from typing import Optional, List
 from numpy import ndarray
 import numpy as np
 import warnings
+from MomentumCalculation import calculateMomentum
 
 class Particle:    
     def __init__(self, x:            Optional[np.ndarray]           = None, \
                        y:            Optional[np.ndarray]           = None, \
                        tof:          Optional[np.ndarray]           = None, \
-                       m:            Optional[np.ndarray|int|float] = None, \
-                       q:            Optional[np.ndarray|int|float] = None, \
+                       m:            Optional[int|float] = None, \
+                       q:            Optional[int|float] = None, \
                        tofMean:      Optional[float]                = None, \
                        px:           Optional[np.ndarray]           = None, \
                        py:           Optional[np.ndarray]           = None, \
@@ -32,9 +33,8 @@ class Particle:
         self._x      = None if x      is None else np.array(x, dtype=dtype)      # mm
         self._y      = None if y      is None else np.array(y, dtype=dtype)      # mm
         self._tof    = None if tof    is None else np.array(tof, dtype=dtype)    # ns
-        self._q      = None if q      is None else np.array(q, dtype=dtype)      # a.u.
-        self._m      = None if m      is None else np.array(m, dtype=dtype)      # a.u.
-                                                                    # 
+        self._q      = None if q      is None else float(q)                      # a.u.
+        self._m      = None if m      is None else float(m)                      # a.u.
         self._px     = None if px     is None else np.array(px, dtype=dtype)     # a.u.
         self._py     = None if py     is None else np.array(py, dtype=dtype)     # a.u.
         self._pz     = None if pz     is None else np.array(pz, dtype=dtype)     # a.u.
@@ -217,66 +217,20 @@ class Particle:
         if calcSettings is None:
             calcSettings = self.calcSettings
 
-        if spectrometer.gyrationPeriod is not None and spectrometer.gyrationPeriod != 0:
-            omega = 2*np.pi*CONSTANTS.NS_SI_TO_AU / spectrometer.gyrationPeriod / self.m
-        rotationAngle = np.deg2rad(calcSettings.rotateDeg)
-        
-        x = self.x   / CONSTANTS.MM_SI_TO_AU
-        y = self.y   / CONSTANTS.MM_SI_TO_AU
-        t = self.tof / CONSTANTS.NS_SI_TO_AU
-        
-        # Mirror detector
-        if calcSettings.mirrorX:
-            x *= -1
-        if calcSettings.mirrorY:
-            y *= -1
-        
-        # Shift and rotate detector
-        if calcSettings.shiftThenRotate:
-            x += calcSettings.shiftX / CONSTANTS.MM_SI_TO_AU
-            y += calcSettings.shiftY / CONSTANTS.MM_SI_TO_AU
-            t += calcSettings.shiftT / CONSTANTS.NS_SI_TO_AU
-            
-            x, y = x*np.cos(rotationAngle)-y*np.sin(rotationAngle), x*np.sin(rotationAngle)+y*np.cos(rotationAngle)
-        
-        else:
-            x, y = x*np.cos(rotationAngle)-y*np.sin(rotationAngle), x*np.sin(rotationAngle)+y*np.cos(rotationAngle)
-            
-            x += calcSettings.shiftX / CONSTANTS.MM_SI_TO_AU
-            y += calcSettings.shiftY / CONSTANTS.MM_SI_TO_AU
-            t += calcSettings.shiftT / CONSTANTS.NS_SI_TO_AU
-        
-        
-        # Stretch detector
-        x *= calcSettings.stretchX * calcSettings.stretchTotal
-        y *= calcSettings.stretchY * calcSettings.stretchTotal
-        
-        
-        # Calculate momentum
-        if spectrometer.gyrationPeriod is not None and spectrometer.gyrationPeriod != 0:
-            px = self.m*omega * 0.5 * (x / np.tan(omega * t * 0.5) - y)
-            py = self.m*omega * 0.5 * (y / np.tan(omega * t * 0.5) + x) * self._mirrorYElectron
-        else:
-            px = self.m * x / t
-            py = self.m * y / t
-        pz = self._calcZMomentum(tof=t, spectrometer=spectrometer, calcSettings=calcSettings) * self._mirrorYElectron
+        px, py, pz = calculateMomentum(
+            self.x, 
+            self.y, 
+            self.tof, 
+            self.m, 
+            self.q, 
+            spectrometer, 
+            calcSettings,
+            self._electricFieldPolarity,
+            self._mirrorYElectron,
+            self.tofMean
+        )
 
-        # Removing nan
-        indexes = np.isfinite(pz)
-        px = px[indexes]
-        py = py[indexes]
-        pz = pz[indexes]
-        indexes = None
         
-        # Shift momentum
-        px += calcSettings.shiftPX
-        py += calcSettings.shiftPY
-        pz += calcSettings.shiftPZ
-
-        # Stretch momentum
-        px *= calcSettings.stretchPX * calcSettings.stretchPTotal
-        py *= calcSettings.stretchPY * calcSettings.stretchPTotal
-        pz *= calcSettings.stretchPZ * calcSettings.stretchPTotal
         
         # Calculate derived values
         p2     = px**2 + py**2 + pz**2
@@ -518,9 +472,9 @@ class Particle_jit:
         if tof is not None:
             self._tof = np.array(tof, dtype=np.float64)    # ns
         if q is not None:
-            self._q = np.array(q, dtype=np.float64)      # a.u.
+            self._q = float(q)      # a.u.
         if m is not None:
-            self._m      = np.array(m, dtype=np.float64)      # a.u.
+            self._m = float(m)      # a.u.
         if px is not None:
             self._px     = np.array(px, dtype=np.float64)     # a.u.
         if py is not None:
