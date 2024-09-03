@@ -491,7 +491,20 @@ class ParticleList:
     ("_calcSettings", CalcSettings.class_type.instance_type),
     ("_electricFieldPolarity", int64),
     ("_mirrorYElectron", int64),
-    ("_recalculateMomentum", boolean)
+    ("_recalculateMomentum", boolean),
+    ("_x_isNone", boolean),
+    ("_y_isNone", boolean),
+    ("_tof_isNone", boolean),
+    ("_m_isNone", boolean),
+    ("_q_isNone", boolean),
+    ("_tofMean_isNone", boolean),
+    ("_px_isNone", boolean),
+    ("_py_isNone", boolean),
+    ("_pz_isNone", boolean),
+    ("_p_isNone", boolean),
+    ("_energy_isNone", boolean),
+    ("_spectrometer_isNone", boolean),
+    ("_calcSettings_isNone", boolean),
 ])
 class Particle_jit:
     
@@ -513,50 +526,86 @@ class Particle_jit:
                 ) -> None:
         if x is not None:
             self._x = np.array(x, dtype=np.float64) # mm
+            self._x_isNone = False
+        else:
+            self._x_isNone = True
         if y is not None:
-            self._y = np.array(y, dtype=np.float64) # mm   
+            self._y = np.array(y, dtype=np.float64) # mm
+            self._y_isNone = False
+        else:
+            self._y_isNone = True
         if tof is not None:
             self._tof = np.array(tof, dtype=np.float64)    # ns
+            self._tof_isNone = False
+        else:
+            self._tof_isNone = True
         if q is not None:
             self._q = np.array(q, dtype=np.float64)      # a.u.
+            self._q_isNone = False
+        else:
+            self._q_isNone = True
         if m is not None:
             self._m      = np.array(m, dtype=np.float64)      # a.u.
+            self._m_isNone = False
+        else:
+            self._m_isNone = True
         if px is not None:
             self._px     = np.array(px, dtype=np.float64)     # a.u.
+            self._px_isNone = False
+        else:
+            self._px_isNone = True
         if py is not None:
             self._py     = np.array(py, dtype=np.float64)     # a.u.
+            self._py_isNone = False
+        else:
+            self._py_isNone = True
         if pz is not None:
             self._pz     = np.array(pz, dtype=np.float64)     # a.u.
+            self._pz_isNone = False
+        else:
+            self._pz_isNone = True
         if p is not None:
             self._p      = np.array(p, dtype=np.float64)      # a.u.
+            self._p_isNone = False
+        else:
+            self._p_isNone = True
         if energy is not None:
             self._energy = np.array(energy, dtype=np.float64) # eV
+            self._energy_isNone = False
+        else:
+            self._energy_isNone = True
         
         if spectrometer is not None:
             self._spectrometer          = spectrometer
+            self._spectrometer_isNone = False
+        else:
+            self._spectrometer_isNone = True
         self._recalculateMomentum   = recalculateMomentum
         self._electricFieldPolarity = 1 if isIonSide else -1
         self._mirrorYElectron       = 1 if isIonSide else -1
         if calcSettings is not None:
             self._calcSettings          = calcSettings
+            self._calcSettings_isNone = False
+        else:
+            self._calcSettings_isNone = True
         if tofMean is not None:
             self._tofMean = tofMean
-
-        
-        self._dtype = np.double
-        self._ctype = np.cdouble
+            self._tofMean_isNone = False
+        else:
+            self._tofMean_isNone = True
     
     def setUpdateMomentum(self):
         self._recalculateMomentum = True
     
     @property
     def tofMean(self) -> float:
-        if self._tofMean is None:
+        if self._tofMean_isNone:
             raise ValueError("The variable 'tofMean' is not yet set!")
         return self._tofMean
     @tofMean.setter
     def tofMean(self, tofMean: float) -> None:
         self._tofMean = tofMean
+        self._tofMean_isNone = False
         self._recalculateMomentum = True
 
     @property
@@ -564,13 +613,14 @@ class Particle_jit:
         """
         x-position of particle in mm
         """
-        if self._x is None:
+        if self._x_isNone:
             raise ValueError("The variable 'x' is not yet set!")
         return self._x
     @x.setter
     def x(self, x: np.ndarray) -> None:
         import numpy as np
-        self._x = np.array(x, dtype=self._dtype)
+        self._x = np.array(x, dtype=np.double)
+        self._x_isNone = False
         self._recalculateMomentum = True
     
     @property
@@ -578,13 +628,14 @@ class Particle_jit:
         """
         y-position of particle in mm
         """
-        if self._y is None:
+        if self._y_isNone:
             raise ValueError("The variable 'y' is not yet set!")
         return self._y
     @y.setter
     def y(self, y: np.ndarray) -> None:
         import numpy as np
-        self._y = np.array(y, dtype=self._dtype)
+        self._y = np.array(y, dtype=np.double)
+        self._y_isNone = False
         self._recalculateMomentum = True
     
     @property
@@ -592,13 +643,14 @@ class Particle_jit:
         """
         tof of particle in ns
         """
-        if self._tof is None:
+        if self._tof_isNone:
             raise ValueError("The variable 'tof' is not tofet set!")
         return self._tof
     @tof.setter
     def tof(self, tof: np.ndarray) -> None:
         import numpy as np
-        self._tof = np.array(tof, dtype=self._dtype)
+        self._tof = np.array(tof, dtype=np.double)
+        self._tof_isNone = False
         self._recalculateMomentum = True
     
     @property
@@ -606,13 +658,14 @@ class Particle_jit:
         """
         mass of particle in a.u.
         """
-        if self._m is None:
+        if self._m_isNone:
             raise ValueError("The variable 'm' is not yet set!")
         return self._m
     @m.setter
     def m(self, m: np.ndarray) -> None:
         import numpy as np
-        self._m = np.array(m, dtype=self._dtype)
+        self._m = np.array(m, dtype=np.double)
+        self._m_isNone = False
         self._recalculateMomentum = True
     
     @property
@@ -620,20 +673,21 @@ class Particle_jit:
         """
         electric charge of particle in a.u.
         """
-        if self._q is None:
+        if self._q_isNone:
             raise ValueError("The variable 'q' is not yet set!")
         return self._q
     @q.setter
     def q(self, q: np.ndarray) -> None:
         import numpy as np
-        self._q = np.array(q, dtype=self._dtype)
+        self._q = np.array(q, dtype=np.double)
+        self._q_isNone = False
         self._recalculateMomentum = True
     @property
     def px(self) -> np.ndarray:
         """
         x-momentum of particle in a.u.
         """
-        if self._px is None or self._recalculateMomentum:
+        if self._px_isNone or self._recalculateMomentum:
             self.calcMomentum()
         return self._px
     @property
@@ -641,7 +695,7 @@ class Particle_jit:
         """
         y-momentum of particle in a.u.
         """
-        if self._py is None or self._recalculateMomentum:
+        if self._py_isNone or self._recalculateMomentum:
             self.calcMomentum()
         return self._py
     @property
@@ -649,7 +703,7 @@ class Particle_jit:
         """
         z-momentum of particle in a.u.
         """
-        if self._pz is None or self._recalculateMomentum:
+        if self._pz_isNone or self._recalculateMomentum:
             self.calcMomentum()
         return self._pz
     @property
@@ -662,7 +716,7 @@ class Particle_jit:
 
         if self._recalculateMomentum:
             self.calcMomentum()
-        if self._p is None:
+        if self._p_isNone:
             self._p = sqrt(self.px**2 + self.py**2 + self.pz**2)
         return self._p
     @property
@@ -670,27 +724,29 @@ class Particle_jit:
         """
         kinetic energy of particle in eV
         """
-        if self._energy is None or self._recalculateMomentum:
+        if self._energy_isNone or self._recalculateMomentum:
             self.calcMomentum()
         return self._energy
     
     @property
     def spectrometer(self) -> np.ndarray:
-        if self._spectrometer is None:
+        if self._spectrometer_isNone:
             raise ValueError("The variable 'spectrometer' is not yet set!")
         return self._spectrometer
     @spectrometer.setter
     def spectrometer(self, spectrometer: Spectrometer) -> None:
         self._spectrometer = spectrometer
+        self._spectrometer_isNone = False
         self._recalculateMomentum = True
     @property
     def calcSettings(self) -> np.ndarray:
-        if self._calcSettings is None:
+        if self._calcSettings_isNone:
             raise ValueError("The variable 'calcSettings' is not yet set!")
         return self._calcSettings
     @calcSettings.setter
     def calcSettings(self, calcSettings: calcSettings) -> None:
         self._calcSettings = calcSettings
+        self._calcSettings_isNone = False
         self._recalculateMomentum = True
     
     def calcMomentum(self, spectrometer: Optional[Spectrometer] = None, \
@@ -700,6 +756,9 @@ class Particle_jit:
             spectrometer = self.spectrometer
         if calcSettings is None:
             calcSettings = self.calcSettings
+
+        if self.x is None:
+            raise Exception("x not jet set")
 
         if spectrometer.gyrationPeriod is not None and spectrometer.gyrationPeriod != 0:
             omega = 2*np.pi*CONSTANTS.NS_SI_TO_AU / spectrometer.gyrationPeriod / self.m
@@ -797,16 +856,21 @@ class Particle_jit:
                 s_B, a = spectrometer[0] # Length and field of acceleration region
                 a     *= self._electricFieldPolarity
                 s_D, _ = spectrometer[1] # Length drift region
-                t      = np.array(tof, dtype=self._ctype)
+                t      = np.array(tof, dtype=np.cdouble)
                 m      = self.m
                 s      = s_B + s_D       # Total length of spectrometer
                 q      = self.q
+                v = np.empty(t.shape, dtype=np.cdouble)
                 
                 # calculate velocity
                 v = (-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + np.sqrt((-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**2 + 4*(24*a*q*t**2*s_B - (a*q*t**2 - 2*s)**2)**3) + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**(1./3.)/(6*2**(1./3.)*t) - (24*a*q*t**2*s_B - (a*q*t**2 - 2*s)**2)/(3*2**(2./3.)*t*(-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + np.sqrt((-2*a**3*q**3*t**6 - 144*a**2*q**2*t**4*s_B + 12*a**2*q**2*s*t**4 + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**2 + 4*(24*a*q*t**2*s_B - (a*q*t**2 - 2*s)**2)**3) + 108*a*q*t**2*s_B**2 + 72*a*q*s*t**2*s_B + 84*a*q*s**2*t**2 + 16*s**3)**(1./3.)) - (a*q*t**2 - 2*s)/(6*t)
                 #print(np.sum(np.imag(v)!=0.), v, np.imag(v)!=0)
-                vReal = np.array(np.real(v), dtype=self._dtype)
-                vReal[np.imag(v)!=0] = None
+                #vReal = np.array(np.real(v), dtype=np.double)
+                #lv = tof.shape
+                #for i in range(lv):
+                #    if np.imag(v[i]) != 0:
+                #        vReal[i] = None
+                vReal[np.imag(v)!=0] = np.nan #None
                 #print(len(v), np.sum(np.imag(v)!=0))
                 return m*vReal
             else:
