@@ -33,8 +33,8 @@ class Particle:
         self._x      = None if x      is None else np.array(x, dtype=dtype)      # mm
         self._y      = None if y      is None else np.array(y, dtype=dtype)      # mm
         self._tof    = None if tof    is None else np.array(tof, dtype=dtype)    # ns
-        self._q      = None if q      is None else q                             # a.u.
-        self._m      = None if m      is None else m                             # a.u.
+        self._q      = None if q      is None else float(q)                      # a.u.
+        self._m      = None if m      is None else float(m)                      # a.u.
         self._px     = None if px     is None else np.array(px, dtype=dtype)     # a.u.
         self._py     = None if py     is None else np.array(py, dtype=dtype)     # a.u.
         self._pz     = None if pz     is None else np.array(pz, dtype=dtype)     # a.u.
@@ -518,9 +518,9 @@ class Particle_jit:
         if tof is not None:
             self._tof = np.array(tof, dtype=np.float64)    # ns
         if q is not None:
-            self._q = q      # a.u.
+            self._q = float(q)      # a.u.
         if m is not None:
-            self._m = m      # a.u.
+            self._m = float(m)      # a.u.
         if px is not None:
             self._px     = np.array(px, dtype=np.float64)     # a.u.
         if py is not None:
