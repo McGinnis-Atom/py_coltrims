@@ -227,7 +227,7 @@ class Particle:
             calcSettings,
             self._electricFieldPolarity,
             self._mirrorYElectron,
-            self.tofMean
+            self._tofMean
         )
 
         
