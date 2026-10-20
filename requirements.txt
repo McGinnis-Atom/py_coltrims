@@ -1,6 +1,5 @@
 numpy
 pandas
-typing
 matplotlib
 ipympl
 numba

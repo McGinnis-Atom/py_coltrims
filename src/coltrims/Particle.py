@@ -1,14 +1,14 @@
 from __future__ import annotations
-import CONSTANTS
-from Spectrometer import Spectrometer, Spectrometer_jit
-from CalcSettings import CalcSettings
+from . import CONSTANTS
+from .Spectrometer import Spectrometer, Spectrometer_jit
+from .CalcSettings import CalcSettings
 from numba.experimental import jitclass
 from numba import boolean, int64, float64
 from typing import Optional, List
 from numpy import ndarray
 import numpy as np
 import warnings
-from MomentumCalculation import calculateMomentum
+from .MomentumCalculation import calculateMomentum
 
 class Particle:    
     def __init__(self, x:            Optional[np.ndarray]           = None, \

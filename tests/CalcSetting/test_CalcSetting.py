@@ -1,5 +1,5 @@
 import numba
-from CalcSettings import CalcSettings
+from coltrims.CalcSettings import CalcSettings
 
 
 class TestCalcSettings:

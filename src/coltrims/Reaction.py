@@ -1,8 +1,8 @@
 from __future__ import annotations
-import CONSTANTS
-from Spectrometer import Spectrometer
-from CalcSettings import CalcSettings
-from Particle import ParticleList, Particle, Electron, Ion
+from . import CONSTANTS
+from .Spectrometer import Spectrometer
+from .CalcSettings import CalcSettings
+from .Particle import ParticleList, Particle, Electron, Ion
 
 class Reaction:
     from typing import Optional

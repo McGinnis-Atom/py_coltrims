@@ -1,6 +1,6 @@
 from __future__ import annotations
-import CONSTANTS
-from Particle import Particle
+from . import CONSTANTS
+from .Particle import Particle
 
 class CoordinateSystem:
     from typing import overload, Union

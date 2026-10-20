@@ -1,5 +1,5 @@
 from __future__ import annotations
-import CONSTANTS
+from . import CONSTANTS
 from typing import Optional, List
 import numpy as np
 from numba.experimental import jitclass

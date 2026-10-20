@@ -1,11 +1,11 @@
 from __future__ import annotations
 from typing import Optional, List
 import numpy as np
-from Spectrometer import Spectrometer, Spectrometer_jit
-from CalcSettings import CalcSettings
+from .Spectrometer import Spectrometer, Spectrometer_jit
+from .CalcSettings import CalcSettings
 import numba
 from numba import boolean, int64, float64
-import CONSTANTS
+from . import CONSTANTS
 
 def calculateMomentum(
     x: np.ndarray,
